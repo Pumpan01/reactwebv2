@@ -4,13 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-
 function EditProfile({ onProfileUpdate }) {
     const navigate = useNavigate();
     const [profilePicture, setProfilePicture] = useState('');
     const [userName, setUserName] = useState('');
     const [userEmail, setUserEmail] = useState('');
     const [userPhone, setUserPhone] = useState('');
+    const [userAge, setUserAge] = useState('');
+    const [userGender, setUserGender] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
 
     useEffect(() => {
@@ -28,11 +29,13 @@ function EditProfile({ onProfileUpdate }) {
                     },
                 });
 
-                const { email, name, picture, number } = response.data;
+                const { email, name, picture, number, age, gender } = response.data;
                 setUserName(name);
                 setUserEmail(email);
                 setProfilePicture(picture);
-                setUserPhone(number !== '0' ? number : ''); // ใช้ number จาก response ถ้าไม่ใช่ '0'
+                setUserPhone(number !== '0' ? number : '');
+                setUserAge(age);
+                setUserGender(gender);
             } catch (error) {
                 console.error('Error fetching user profile:', error);
                 navigate('/login');
@@ -44,6 +47,13 @@ function EditProfile({ onProfileUpdate }) {
 
     const handleFileChange = (event) => {
         setSelectedFile(event.target.files[0]);
+        if (event.target.files[0]) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                setProfilePicture(reader.result); // Update preview
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
     };
 
     const handleUpdateProfile = async () => {
@@ -58,6 +68,8 @@ function EditProfile({ onProfileUpdate }) {
             formData.append('name', userName);
             formData.append('email', userEmail);
             formData.append('number', userPhone);
+            formData.append('age', userAge);
+            formData.append('gender', userGender);
 
             if (selectedFile) {
                 formData.append('profilePicture', selectedFile);
@@ -83,7 +95,7 @@ function EditProfile({ onProfileUpdate }) {
                     if (onProfileUpdate) {
                         onProfileUpdate();
                     }
-                    navigate('/profile'); // ย้ายไปที่หน้า Users หลังจากแจ้งเตือนเสร็จ
+                    navigate('/profile');
                 }, 1000);
             } else {
                 throw new Error('Update failed');
@@ -109,7 +121,7 @@ function EditProfile({ onProfileUpdate }) {
                     <div className="relative mb-4">
                         {profilePicture ? (
                             <img
-                                src={`http://localhost:4000${profilePicture}`}
+                                src={profilePicture} // Display preview
                                 alt="Profile"
                                 className="w-32 h-32 rounded-full object-cover shadow-md"
                             />
@@ -139,7 +151,7 @@ function EditProfile({ onProfileUpdate }) {
                         className="w-full mt-1 p-2 border border-gray-300 rounded"
                     />
                 </div>
-                <div className="mb-6">
+                <div className="mb-4">
                     <label className="block text-gray-700">Phone Number:</label>
                     <input
                         type="text"
@@ -147,6 +159,28 @@ function EditProfile({ onProfileUpdate }) {
                         onChange={(e) => setUserPhone(e.target.value)}
                         className="w-full mt-1 p-2 border border-gray-300 rounded"
                     />
+                </div>
+                <div className="mb-4">
+                    <label className="block text-gray-700">Age:</label>
+                    <input
+                        type="number"
+                        value={userAge}
+                        onChange={(e) => setUserAge(e.target.value)}
+                        className="w-full mt-1 p-2 border border-gray-300 rounded"
+                    />
+                </div>
+                <div className="mb-6">
+                    <label className="block text-gray-700">Gender:</label>
+                    <select
+                        value={userGender}
+                        onChange={(e) => setUserGender(e.target.value)}
+                        className="w-full mt-1 p-2 border border-gray-300 rounded"
+                    >
+                        <option value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
                 </div>
                 <button
                     onClick={handleUpdateProfile}

@@ -6,6 +6,8 @@ export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [age, setAge] = useState(''); // เพิ่ม field อายุ
+  const [gender, setGender] = useState(''); // เพิ่ม field เพศ
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
@@ -16,11 +18,13 @@ export default function Register() {
     setSuccess('');
 
     try {
-      // ตรวจสอบว่าข้อมูล email, password, และ name ถูกส่งไปที่ API
+      // ตรวจสอบว่าข้อมูล email, password, name ถูกส่งไปที่ API
       const response = await axios.post('http://localhost:4000/register', {
         email,
         password,
         name,
+        age, // ส่งข้อมูลอายุ
+        gender // ส่งข้อมูลเพศ
       });
 
       if (response.status === 201) {
@@ -100,6 +104,41 @@ export default function Register() {
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your password"
             />
+          </div>
+
+          {/* ฟิลด์ใหม่สำหรับอายุ */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700" htmlFor="age">
+              Age
+            </label>
+            <input
+              type="number"
+              id="age"
+              value={age}
+              onChange={(e) => setAge(e.target.value)}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter your age"
+            />
+          </div>
+
+          {/* ฟิลด์ใหม่สำหรับเพศ */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700" htmlFor="gender">
+              Gender
+            </label>
+            <select
+              id="gender"
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="" disabled>Select your gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
           </div>
 
           <button

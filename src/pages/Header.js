@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 function Header({ handleLogout, userName }) {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
   return (
     <header className="bg-gray-800 shadow p-4 flex justify-between items-center text-white fixed w-full z-10">
       <div className="flex items-center">
@@ -11,18 +9,20 @@ function Header({ handleLogout, userName }) {
           ⚽ Football Fun Zone!
         </Link>
       </div>
-      <div className="flex-1 flex justify-center space-x-6">
-        <Link to="/users" className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600">Users</Link>
-        <Link to="/about" className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600">About</Link>
-        <Link to="/profile" className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600">Profile</Link>
-      </div>
+      <nav className="flex-1 flex justify-center space-x-6">
+        <Link to="/post" className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600 transition">Post</Link>
+        <Link to="/search-shirts" className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600 transition">Shirts</Link>
+        <Link to="/cart" className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600 transition">Cart</Link>
+        <Link to="/profile" className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600 transition">Profile</Link>
+      </nav>
       <div className="flex items-center">
-        <div className="bg-gray-700 text-white px-3 py-1 rounded-lg mr-4"> {/* เพิ่ม margin ขวาให้กับชื่อผู้ใช้ */}
+        <div className="bg-gray-700 text-white px-3 py-1 rounded-lg mr-4">
           {userName}
         </div>
         <button 
           onClick={handleLogout} 
-          className="text-white bg-red-600 px-3 py-1 rounded hover:bg-red-500"
+          className="text-white bg-red-600 px-3 py-1 rounded hover:bg-red-500 transition"
+          aria-label="Logout" // เพิ่ม aria-label สำหรับการเข้าถึง
         >
           Logout
         </button>

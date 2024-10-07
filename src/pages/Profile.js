@@ -9,6 +9,8 @@ function Profile() {
     const [userName, setUserName] = useState('');
     const [userEmail, setUserEmail] = useState('');
     const [userPhone, setUserPhone] = useState('');
+    const [userAge, setUserAge] = useState(''); // อายุ
+    const [userGender, setUserGender] = useState(''); // เพศ
     const [isEditing, setIsEditing] = useState(false);
 
     // ฟังก์ชันดึงข้อมูลผู้ใช้เมื่อหน้าโหลด
@@ -25,11 +27,13 @@ function Profile() {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-            const { email, name, picture, number } = response.data;
+            const { email, name, picture, number, age, gender } = response.data; // ดึงข้อมูลอายุและเพศ
             setUserName(name);
             setUserEmail(email);
             setProfilePicture(picture);
             setUserPhone(number);
+            setUserAge(age); // ตั้งค่าอายุ
+            setUserGender(gender); // ตั้งค่าเพศ
         } catch (error) {
             console.error('Error fetching user profile:', error);
             navigate('/login');
@@ -47,7 +51,7 @@ function Profile() {
     return (
         <div className="min-h-screen bg-gray-100 flex justify-center items-center p-6">
             <div className="bg-white shadow-lg rounded-lg p-8 max-w-md w-full text-center">
-                <h1 className="text-3xl font-bold text-gray-800 mb-6">User Profile</h1>
+                <h1 className="text-3xl font-bold text-gray-800 mb-6">Profile</h1>
                 <div className="flex flex-col items-center">
                     <div className="relative mb-6">
                         {profilePicture ? (
@@ -63,9 +67,11 @@ function Profile() {
                         )}
                     </div>
                     <div className="text-center text-gray-800 mb-6">
-                        <p className="text-lg font-semibold">{userName}</p>
-                        <p className="text-gray-600">{userEmail}</p>
-                        <p className="text-gray-600">{userPhone || "No Phone Number"}</p>
+                        <p className="text-lg font-semibold">ID: {userName}</p>
+                        <p className="text-gray-600">Email: {userEmail}</p>
+                        <p className="text-gray-600">Phone Number: {userPhone || "No Phone Number"}</p>
+                        <p className="text-gray-600">Age: {userAge || "No Age Provided"}</p>
+                        <p className="text-gray-600">Gender: {userGender || "No Gender Provided"}</p>
                     </div>
                     <button
                         onClick={() => setIsEditing(true)}
