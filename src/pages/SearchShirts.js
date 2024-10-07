@@ -12,16 +12,26 @@ function SearchShirts() {
   
   const fetchShirts = async () => {
     try {
-        const response = await axios.get('http://localhost:4000/shirts');
-        setShirts(response.data);
+      const response = await axios.get('http://localhost:4000/shirts');
+      setShirts(response.data);
     } catch (error) {
-        console.error('Error fetching shirts:', error);
+      console.error('Error fetching shirts:', error);
     }
   };
 
   const handleAddToCart = async (shirt) => {
     try {
-      await addToCart(shirt); // เพิ่มเสื้อในตะกร้า
+      const shirtData = {
+        shirtId: shirt.IDPOST, // ใช้ IDPOST ของเสื้อเป็น shirtId
+      };
+
+      await axios.post('http://localhost:4000/cart', shirtData, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`, // ส่ง token สำหรับยืนยันตัวตน
+        },
+      });
+
+      addToCart(shirt); // เพิ่มเสื้อในตะกร้า
       console.log(`Adding to cart: ${shirt.namepost}`);
     } catch (error) {
       console.error('Error adding to cart:', error); // แสดงข้อผิดพลาด

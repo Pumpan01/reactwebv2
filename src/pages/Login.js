@@ -13,30 +13,28 @@ export default function Login({ handleLogin }) {
     setError('');
 
     try {
-      // ส่งคำขอล็อกอินไปที่ API
       const response = await axios.post('http://localhost:4000/login', {
         email,
         password,
       });
 
-      // เมื่อสำเร็จ ให้เรียก handleLogin และเก็บ token
       handleLogin(response.data.token);
-      navigate('/home'); // นำผู้ใช้ไปที่หน้า Home
+      navigate('/home');
 
     } catch (error) {
-      // แสดง error หากการล็อกอินไม่สำเร็จ
       setError(error.response?.data?.message || 'เกิดข้อผิดพลาดในการล็อกอิน');
     }
   };
 
   const navigateToRegister = () => {
-    navigate('/register'); // นำผู้ใช้ไปที่หน้าสมัครสมาชิก
+    navigate('/register');
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-500 to-purple-500">
-      <div className="w-full max-w-sm p-8 bg-white shadow-lg rounded-lg">
-        <h2 className="text-center text-3xl font-bold text-gray-800 mb-6">⚽ Football Fun Zone!</h2>
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-8">
+        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Welcome Page</h2>
+        <h3 className="text-lg text-center text-gray-600 mb-4">Hello! Good Morning</h3>
 
         {error && (
           <div className="p-4 mb-4 text-red-700 bg-red-100 rounded-lg">
@@ -47,7 +45,7 @@ export default function Login({ handleLogin }) {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700" htmlFor="email">
-              Username
+              Email Address
             </label>
             <input
               type="email"
@@ -75,11 +73,19 @@ export default function Login({ handleLogin }) {
             />
           </div>
 
+          <div className="flex items-center mb-4">
+            <input
+              type="checkbox"
+              className="mr-2 leading-tight"
+            />
+            <span className="text-sm">Remember Me</span>
+          </div>
+
           <button
             type="submit"
-            className="w-full py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md"
+            className="w-full py-2 text-white bg-gradient-to-r from-blue-500 to-purple-500 rounded-md"
           >
-            Login
+            Submit
           </button>
         </form>
 
@@ -90,7 +96,7 @@ export default function Login({ handleLogin }) {
               onClick={navigateToRegister}
               className="text-blue-500 hover:underline"
             >
-              Signup
+              Create Account
             </button>
           </p>
         </div>
