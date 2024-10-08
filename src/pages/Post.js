@@ -97,7 +97,7 @@ function Post() {
       cancelButtonColor: '#d33',
       confirmButtonText: 'ใช่, ลบโพสต์!',
     });
-
+  
     if (result.isConfirmed) {
       try {
         await axios.delete(`http://localhost:4000/posts/${id}`, {
@@ -108,12 +108,12 @@ function Post() {
         fetchPosts(); // เรียกดูโพสต์ใหม่หลังจากลบโพสต์
         Swal.fire('Deleted!', 'โพสต์ถูกลบเรียบร้อยแล้ว.', 'success');
       } catch (error) {
-        console.error('Error deleting post:', error);
+        console.error('Error deleting post:', error.response || error.message); // แสดงรายละเอียดของข้อผิดพลาด
         Swal.fire('Error!', 'ไม่สามารถลบโพสต์ได้.', 'error');
       }
     }
   };
-
+  
   return (
     <div className="flex p-8 bg-gray-100">
       <div className="bg-white p-4 rounded-lg shadow-lg w-1/4 mr-4">
