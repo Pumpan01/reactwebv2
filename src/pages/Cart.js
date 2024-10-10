@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useCart } from '../CartContext';
 import axios from 'axios';
+import Swal from 'sweetalert2'; // นำเข้า SweetAlert2
 
 function Cart() {
   const [cartItems, setCartItems] = useState([]);
@@ -46,10 +47,21 @@ function Cart() {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
       });
+
       removeFromCart(shirtId);
       fetchCartItems(); // เรียกดูข้อมูลตะกร้าอีกครั้งหลังจากลบ
+
+      // แสดง popup แจ้งเตือนว่าได้ลบสินค้าแล้ว
+      Swal.fire({
+        title: 'ลบสินค้าแล้ว!',
+        text: 'สินค้าถูกลบออกจากตะกร้าเรียบร้อยแล้ว',
+        icon: 'success',
+        confirmButtonText: 'ตกลง'
+      });
+      
     } catch (error) {
       console.error('Error removing from cart:', error);
+      Swal.fire('Error', 'ไม่สามารถลบสินค้าได้', 'error');
     }
   };
 

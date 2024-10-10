@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import Modal from 'react-modal'; // นำเข้า react-modal
+
+// ตั้งค่าให้ modal อยู่ใน root ของ DOM
+Modal.setAppElement('#root');
 
 function Post() {
   const [namePost, setNamePost] = useState('');
@@ -9,19 +13,20 @@ function Post() {
   const [posts, setPosts] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [currentPost, setCurrentPost] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false); // ใช้สำหรับจัดการ popup
 
   useEffect(() => {
-    fetchPosts(); // เรียกดูโพสต์เมื่อคอมโพเนนต์โหลด
+    fetchPosts();
   }, []);
 
   const fetchPosts = async () => {
     try {
       const response = await axios.get('http://localhost:4000/posts', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`, // ส่ง token สำหรับยืนยันตัวตน
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
       });
-      setPosts(response.data); // ตั้งค่าโพสต์
+      setPosts(response.data);
     } catch (error) {
       console.error('Error fetching posts:', error);
     }
@@ -40,14 +45,13 @@ function Post() {
       await axios.post('http://localhost:4000/posts', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`, // ส่ง token สำหรับยืนยันตัวตน
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
       });
-      // Reset fields
       setNamePost('');
       setDescription('');
       setImage(null);
-      fetchPosts(); // เรียกดูโพสต์ใหม่หลังจากสร้างโพสต์
+      fetchPosts();
     } catch (error) {
       console.error('Error creating post:', error);
     }
@@ -66,13 +70,14 @@ function Post() {
       await axios.put(`http://localhost:4000/posts/${currentPost.IDPOST}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`, // ส่ง token สำหรับยืนยันตัวตน
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
       });
       Swal.fire('Updated!', 'โพสต์ถูกอัปเดตเรียบร้อยแล้ว.', 'success');
       setIsEditing(false);
       setCurrentPost(null);
-      fetchPosts(); // เรียกดูโพสต์ใหม่หลังจากอัปเดต
+      setIsModalOpen(false); // ปิด modal
+      fetchPosts();
     } catch (error) {
       console.error('Error updating post:', error);
       Swal.fire('Error!', 'ไม่สามารถอัปเดตโพสต์ได้.', 'error');
@@ -85,6 +90,7 @@ function Post() {
     setDescription(post.description);
     setImage(null);
     setIsEditing(true);
+    setIsModalOpen(true); // เปิด modal เมื่อเริ่มแก้ไข
   };
 
   const handleDelete = async (id) => {
@@ -102,22 +108,23 @@ function Post() {
       try {
         await axios.delete(`http://localhost:4000/posts/${id}`, {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`, // ส่ง token สำหรับยืนยันตัวตน
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
           },
         });
-        fetchPosts(); // เรียกดูโพสต์ใหม่หลังจากลบโพสต์
+        fetchPosts();
         Swal.fire('Deleted!', 'โพสต์ถูกลบเรียบร้อยแล้ว.', 'success');
       } catch (error) {
-        console.error('Error deleting post:', error.response || error.message); // แสดงรายละเอียดของข้อผิดพลาด
+        console.error('Error deleting post:', error.response || error.message);
         Swal.fire('Error!', 'ไม่สามารถลบโพสต์ได้.', 'error');
       }
     }
   };
-  
+
   return (
     <div className="flex p-8 bg-gray-100">
+      {/* ส่วนสร้างโพสต์ */}
       <div className="bg-white p-4 rounded-lg shadow-lg w-1/4 mr-4">
-        <h2 className="text-2xl font-bold text-center mb-4">{isEditing ? 'แก้ไขโพสต์' : 'สร้างโพสต์'}</h2>
+        <h2 className="text-2xl font-bold text-center mb-4">{'สร้างโพสต์'}</h2>
         <form onSubmit={isEditing ? handleUpdate : handleSubmit} className="space-y-4">
           <div>
             <label className="block text-gray-700">Post Title:</label>
@@ -156,6 +163,7 @@ function Post() {
         </form>
       </div>
 
+      {/* ส่วนโพสต์ทั้งหมด */}
       <div className="bg-white p-4 rounded-lg shadow-lg w-3/4">
         <h2 className="text-2xl font-bold">โพสต์ทั้งหมด</h2>
         <div className="mt-4 grid grid-cols-3 gap-4">
@@ -188,6 +196,53 @@ function Post() {
           )}
         </div>
       </div>
+
+      {/* Modal สำหรับแก้ไขโพสต์ */}
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={() => setIsModalOpen(false)}
+        contentLabel="Edit Post"
+        className="bg-white p-8 rounded-lg shadow-lg max-w-lg mx-auto mt-20"
+        overlayClassName="fixed inset-0 bg-gray-900 bg-opacity-50"
+      >
+        <h2 className="text-2xl font-bold mb-4">แก้ไขโพสต์</h2>
+        <form onSubmit={handleUpdate} className="space-y-4">
+          <div>
+            <label className="block text-gray-700">Post Title:</label>
+            <input
+              type="text"
+              value={namePost}
+              onChange={(e) => setNamePost(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-500"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-gray-700">Description:</label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-500"
+              rows="2"
+              required
+            ></textarea>
+          </div>
+          <div>
+            <label className="block text-gray-700">Image:</label>
+            <input
+              type="file"
+              onChange={(e) => setImage(e.target.files[0])}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-500"
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+          >
+            บันทึกการแก้ไข
+          </button>
+        </form>
+      </Modal>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useCart } from '../CartContext'; // นำเข้า CartContext
 import axios from 'axios';
+import Swal from 'sweetalert2'; // นำเข้า SweetAlert2
 
 function SearchShirts() {
   const [shirts, setShirts] = useState([]);
@@ -32,9 +33,18 @@ function SearchShirts() {
       });
 
       addToCart(shirt); // เพิ่มเสื้อในตะกร้า
-      console.log(`Adding to cart: ${shirt.namepost}`);
+
+      // แสดง popup ว่าเพิ่มเข้าตะกร้าแล้ว
+      Swal.fire({
+        title: 'เพิ่มเข้าตะกร้าแล้ว!',
+        text: `${shirt.namepost} ถูกเพิ่มเข้าตะกร้าของคุณ`,
+        icon: 'success',
+        confirmButtonText: 'ตกลง'
+      });
+
     } catch (error) {
       console.error('Error adding to cart:', error); // แสดงข้อผิดพลาด
+      Swal.fire('Error', 'ไม่สามารถเพิ่มเข้าตะกร้าได้', 'error');
     }
   };
 
